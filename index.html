@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Tracker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+    crossorigin="anonymous" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ion-sound@3.0.7/js/ion.sound.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      transition: background-color 0.5s, all 0.5s;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgb(196, 34, 28);
+      color: white;
+      width: 100%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    header img {
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    #instruction-btn {
+      margin-top: 20px;
+      background-color: #2196F3;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 500;
+      position: absolute;
+      left: 20px;
+    }
+
+    #tracker-container {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 300px;
+      margin-bottom: 80px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: calc(100% - 16px);
+      padding: 10px;
+      margin-bottom: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    #tracker-container button {
+      width: 100%;
+      height: 50px;
+      border: none;
+      border-radius: 8px;
+      transition: all 0.3s;
+      cursor: pointer;
+      background: rgb(196, 34, 28);
+      color: white;
+      font-size: 1em;
+      font-weight: 500;
+    }
+
+    #tracker-container button:hover {
+      background: rgb(158, 23, 18);
+    }
+
+    .toggle-btn {
+      position: fixed;
+      bottom: 30px;
+      left: 20px;
+      background-color: #333;
+      border: none;
+      border-radius: 50px;
+      padding: 7px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.5s ease;
+      z-index: 9999;
+    }
+
+    .toggle-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .toggle-btn:focus {
+      outline: none;
+    }
+
+    /* Light icon */
+    .toggle-btn .fas.fa-sun {
+      color: #f1c40f;
+    }
+
+    .toggle-btn .fas.fa-moon {
+      color: #fff;
+    }
+
+    /* Dark icon */
+    .toggle-btn.dark .fas.fa-moon {
+      color: #ffffff;
+    }
+
+    .toggle-btn .fas.fa-sun {
+      display: none;
+    }
+
+    .toggle-btn .fas.fa-moon {
+      display: flex;
+    }
+
+    #output-container {
+      margin-top: 20px;
+      text-align: left;
+      background-color: #f5f5f5;
+      padding: 16px;
+      border-radius: 8px;
+    }
+
+    .option {
+      margin-bottom: 10px;
+      cursor: pointer;
+      padding: 12px;
+      transition: background-color 0.3s;
+      border-radius: 6px;
+    }
+
+    .option:hover {
+      background-color: #e0e0e0;
+    }
+
+    .option.active {
+      background-color: rgb(197, 65, 65);
+    }
+
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
+
+    footer {
+      background-color: rgb(196, 34, 28);
+      color: #fff;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+    }
+
+    footer p {
+      display: inline;
+    }
+
+    footer a {
+      color: #fff;
+      text-decoration: none;
+      padding: 4px;
+    }
+
+    /* Dark mode */
+    body.dark {
+      background-color: #444;
+      color: #ddd;
+    }
+
+    body.dark header {
+      background-color: rgb(196, 34, 28);
+    }
+
+    body.dark header img {
+      border: 2px solid #ddd;
+    }
+
+    body.dark #tracker-container {
+      background-color: #555;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark label {
+      color: #ddd;
+    }
+
+    body.dark input {
+      border: 1px solid #aaa;
+    }
+
+    body.dark #tracker-container button {
+      background: rgb(196, 34, 28);
+      color: white;
+    }
+
+    body.dark #tracker-container button:hover {
+      background: rgb(158, 23, 18);
+    }
+
+    body.dark .toggle-btn {
+      background-color: #fff;
+    }
+
+    body.dark .toggle-btn .fas.fa-sun {
+      display: flex;
+    }
+
+    body.dark .toggle-btn .fas.fa-moon {
+      display: none;
+    }
+
+    body.dark #output-container {
+      background-color: #666;
+    }
+
+    body.dark .option:hover {
+      background-color: #777;
+    }
+
+    body.dark .option.active {
+      background-color: rgb(197, 65, 65);
+    }
+
+    body.dark .warning {
+      color: #ff5050;
+    }
+
+    body.dark .swal2-popup-dark {
+      background-color: #444;
+      color: #fff;
+    }
+
+    body.dark footer {
+      background-color: rgb(196, 34, 28);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <img src="https://via.placeholder.com/40" alt="User Image">
+    <h2 id="user-name">Hi</h2>
+  </header>
+
+  <button id="instruction-btn" onclick="showInstructions()"><i class="fas fa-book"></i> Instructions</button>
+
+  <div id="tracker-container">
+    <p>Time Tracker</p>
+    <label for="name">Name:</label>
+    <input type="text" id="name" placeholder="Enter your name">
+
+    <label for="lunch">Lunch time (mins):</label>
+    <input type="number" id="lunch" placeholder="Lunch time in mins">
+
+    <label for="break">Break time (mins):</label>
+    <input type="number" id="break" placeholder="Break time in mins">
+
+    <label for="toilet">Toilet time (mins):</label>
+    <input type="number" id="toilet" placeholder="Toilet time in mins">
+
+    <button onclick="trackTime()">Start Tracking</button>
+
+    <div id="output-container">
+      <div id="production-output" class="option" onclick="selectOption('production')"><i class="fa fa-suitcase"
+          style="font-size:20px"></i> Production: 00:00:00</div>
+      <div id="lunch-output" class="option" onclick="selectOption('lunch')"><i class='fas fa-hamburger'
+          style='font-size:20px'></i> Lunch: 00:00:00</div>
+      <div id="break-output" class="option" onclick="selectOption('break')"><i class='fas fa-music'
+          style='font-size:20px'></i> Break: 00:00:00</div>
+      <div id="toilet-output" class="option" onclick="selectOption('toilet')"><i class='fas fa-toilet-paper'
+          style='font-size:20px'></i> Toilet: 00:00:00</div>
+    </div>
+  </div>
+
+  <button class="toggle-btn" id="toggle-btn" onclick="toggleDarkMode()"><i class="fas fa-sun"></i><i
+      class="fas fa-moon"></i></button>
+
+  <footer>
+    <p>Made with <i class="fas fa-heart"></i> by</p><a href="https://developer.variable-hosting.com" target="_blank"> Casper</a>
+    | <a href="https://github.com/CASPERg267/Time-Tracker" target="_blank"><i class="fab fa-github"></i> Source Code</a>
+  </footer>
+
+  <script>
+
+    // Initialize Ion.Sound
+    ion.sound({
+    sounds: [
+      { name: "warning-sound-6686" }
+    ],
+    path: "./",
+    preload: true,
+    volume: 1.0
+  });
+
+  let selectedOption = null;
+  let productionSeconds = 0;
+  let lunchSeconds = 0;
+  let breakSeconds = 0;
+  let toiletSeconds = 0;
+
+  // Object to keep track of warning sound states
+  const soundStates = {
+    lunch: false,
+    break: false,
+    toilet: false
+  };
+
+  function trackTime() {
+    const name = document.getElementById('name').value;
+    const lunchTime = parseInt(document.getElementById('lunch').value) || 0;
+    const breakTime = parseInt(document.getElementById('break').value) || 0;
+    const toiletTime = parseInt(document.getElementById('toilet').value) || 0;
+
+    document.getElementById('user-name').innerText = `Hi ${name}`;
+
+    setInterval(() => {
+      if (selectedOption === 'production') {
+        productionSeconds += 1;
+        document.getElementById('production-output').innerHTML = `<i class="fa fa-suitcase" style="font-size:20px"></i> Production: ${formatTime(productionSeconds)}`;
+      } else if (selectedOption === 'lunch') {
+        lunchSeconds += 1;
+        document.getElementById('lunch-output').innerHTML = `<i class='fas fa-hamburger' style='font-size:20px'></i> Lunch: ${formatTime(lunchSeconds)}`;
+        checkAndPlayWarning(lunchSeconds, lunchTime, 'lunch');
+      } else if (selectedOption === 'break') {
+        breakSeconds += 1;
+        document.getElementById('break-output').innerHTML = `<i class='fas fa-music' style='font-size:20px'></i> Break: ${formatTime(breakSeconds)}`;
+        checkAndPlayWarning(breakSeconds, breakTime, 'break');
+      } else if (selectedOption === 'toilet') {
+        toiletSeconds += 1;
+        document.getElementById('toilet-output').innerHTML = `<i class='fas fa-toilet-paper' style='font-size:20px'></i> Toilet: ${formatTime(toiletSeconds)}`;
+        checkAndPlayWarning(toiletSeconds, toiletTime, 'toilet');
+      }
+    }, 1000); // Update every 1 second
+  }
+
+  function checkAndPlayWarning(seconds, limit, activity) {
+    if (seconds > limit * 60 && !soundStates[activity]) {
+      document.getElementById(`${activity}-output`).classList.add('warning');
+      ion.sound.play("warning-sound-6686");
+      soundStates[activity] = true;
+    } else if (seconds <= limit * 60 && soundStates[activity]) {
+      document.getElementById(`${activity}-output`).classList.remove('warning');
+      soundStates[activity] = false;
+    }
+  }
+
+  function selectOption(option) {
+    selectedOption = option;
+    document.querySelectorAll('.option').forEach(el => el.classList.remove('active'));
+    document.getElementById(`${option}-output`).classList.add('active');
+  }
+
+  function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function toggleDarkMode() {
+    const toggleBtn = document.querySelector('.toggle-btn');
+    const body = document.querySelector('body');
+    body.classList.toggle('dark');
+  }
+
+  function showInstructions() {
+    Swal.fire({
+      title: 'Welcome to Rapid Time Tracker!',
+      html: 'Enter your name and specify the time for lunch, break, and toilet.<br> Click "Start Tracking" to begin. You can track production, lunch, break, and toilet time separately. <br>Warnings will be shown when you exceed the specified time for each activity.',
+      icon: 'info',
+      confirmButtonText: 'Got it!',
+      customClass: {
+        popup: 'swal2-popup-dark',
+      },
+    });
+  }
+  </script>
+</body>
+
+</html>
